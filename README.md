@@ -56,6 +56,10 @@ folder has a `README.md` listing its manifests and the `CHANGE_ME` values to fil
 | media | [prowlarr](media/prowlarr) | Indexer manager |
 | media | [jellyseerr](media/jellyseerr) | Media request manager |
 | media | [flaresolverr](media/flaresolverr) | Cloudflare challenge solver |
+| observability | [prometheus](observability/prometheus) | Metrics collection + TSDB |
+| observability | [grafana](observability/grafana) | Metrics dashboards |
+| observability | [node-exporter](observability/node-exporter) | Per-node host metrics (DaemonSet) |
+| observability | [kube-state-metrics](observability/kube-state-metrics) | Kubernetes object-state metrics |
 | observability | [elasticsearch](observability/elasticsearch) | Search/analytics store |
 | observability | [kibana](observability/kibana) | Elastic UI |
 | observability | [logstash](observability/logstash) | Log pipeline |

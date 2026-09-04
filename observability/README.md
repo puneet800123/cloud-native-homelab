@@ -1,8 +1,25 @@
 # observability
 
-Logging and monitoring. Two independent stacks live here: the **Elastic stack**
-(Elasticsearch → Kibana + Logstash + Fleet/Agents) and a lightweight
-**Fluent Bit → VictoriaLogs** pipeline. `radar` is a cluster resource visualizer.
+Logging and monitoring. Several independent stacks live here: the **Elastic stack**
+(Elasticsearch → Kibana + Logstash + Fleet/Agents), a lightweight
+**Fluent Bit → VictoriaLogs** logging pipeline, and a **Prometheus + Grafana**
+metrics stack (with node-exporter and kube-state-metrics). `radar` is a cluster
+resource visualizer.
+
+### Metrics (Prometheus + Grafana)
+
+| Service | Description | Secrets to set |
+|---------|-------------|----------------|
+| [prometheus](prometheus) | Metrics collection + TSDB (scrapes the stack below) | none |
+| [node-exporter](node-exporter) | Per-node host metrics (DaemonSet) | none |
+| [kube-state-metrics](kube-state-metrics) | Kubernetes object-state metrics | none |
+| [grafana](grafana) | Dashboards (Prometheus datasource pre-provisioned) | admin user + password |
+
+Apply order: `node-exporter` + `kube-state-metrics` → `prometheus` → `grafana`.
+Prometheus discovers node-exporter and kube-state-metrics via their headless
+Services; Grafana reads Prometheus at `http://prometheus:9090`.
+
+### Logging (Elastic stack)
 
 | Service | Description | Secrets to set |
 |---------|-------------|----------------|
