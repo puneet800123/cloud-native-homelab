@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: radarr
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: radarr
+  template:
+    metadata:
+      labels:
+        app: radarr
+    spec:
+      containers:
+      - name: radarr
+        image: lscr.io/linuxserver/radarr:latest
+        ports:
+        - containerPort: 7878
+        envFrom:
+        - configMapRef:
+            name: radarr-config
+        volumeMounts:
+        - name: config
+          mountPath: /config
+        - name: movies
+          mountPath: /movies
+        - name: downloads
+          mountPath: /downloads
+      volumes:
+      - name: config
+        hostPath:
+          path: "/mnt/config/radarr"
+          type: DirectoryOrCreate
+      - name: downloads
+        hostPath:
+          path: "/mnt/media/torrents"
+          type: DirectoryOrCreate
+      - name: movies
+        hostPath:
+          path: "/mnt/media/movies"
+          type: DirectoryOrCreate

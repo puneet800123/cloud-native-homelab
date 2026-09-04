@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: homepage-env
+  namespace: default
+  labels:
+    app.kubernetes.io/name: homepage
+data:
+  # CHANGE_ME: set to the hostname(s) Homepage is served on
+  HOMEPAGE_ALLOWED_HOSTS: example.com
+  LOG_LEVEL: debug

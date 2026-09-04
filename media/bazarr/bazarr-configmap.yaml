@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bazarr-config
+  namespace: default
+  labels:
+    app: bazarr
+data:
+  PUID: "1000"
+  PGID: "1000"
+  TZ: "Asia/Kolkata"

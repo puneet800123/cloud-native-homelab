@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fleet-server-config
+  namespace: default
+  labels:
+    app: fleet-server
+data:
+  # Tells the entrypoint: bootstrap me as a Fleet Server
+  FLEET_SERVER_ENABLE: "true"
+  FLEET_SERVER_PORT: "8220"
+  # Where Fleet Server writes its indices (.fleet-*)
+  FLEET_SERVER_ELASTICSEARCH_HOST: "https://elasticsearch:9200"
+  FLEET_SERVER_ELASTICSEARCH_CA: "/etc/fleet/certs/ca.crt"
+  FLEET_CA: "/etc/fleet/certs/ca.crt"
+  FLEET_URL: "https://fleet-server.default.svc.cluster.local:8220"
+  # Fleet Server's own TLS (agents enroll over this)
+  FLEET_SERVER_CERT: "/etc/fleet/certs/tls.crt"
+  FLEET_SERVER_CERT_KEY: "/etc/fleet/certs/tls.key"
+  # The Fleet Server policy ID — Kibana auto-creates a "fleet-server-policy"
+  # on first start; we reference it by its built-in ID.
+  FLEET_SERVER_POLICY_ID: "fleet-server-policy"

@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kibana-config
+  namespace: default
+  labels:
+    app: kibana
+data:
+  kibana.yml: |
+    server.name: kibana
+    server.host: "0.0.0.0"
+
+    # Kibana's own HTTPS for browser clients
+    server.ssl.enabled: true
+    server.ssl.certificate: /usr/share/kibana/config/certs/tls.crt
+    server.ssl.key: /usr/share/kibana/config/certs/tls.key
+
+    # Talking to Elasticsearch over HTTPS
+    elasticsearch.hosts: ["https://elasticsearch:9200"]
+    elasticsearch.ssl.certificateAuthorities: ["/usr/share/kibana/config/certs/ca.crt"]
+    elasticsearch.ssl.verificationMode: certificate
+
+    # kibana_system user creds (created in ES after first start)
+    elasticsearch.username: "kibana_system"
+    # password injected via env var ELASTICSEARCH_PASSWORD (see Deployment)
+
+    # Fleet — tell Kibana where Fleet Server is. The Fleet output (where
+    # agents send data) is configured via the Kibana UI on first run.
+    xpack.fleet.agents.fleet_server.hosts: ["https://fleet-server.default.svc.cluster.local:8220"]
+
+    # Encryption keys are injected as environment variables from the
+    # 'kibana-encryption-keys' Secret (see the Deployment). They are NOT
+    # stored here so this ConfigMap stays free of secret material.

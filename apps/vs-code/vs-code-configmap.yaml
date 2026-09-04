@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vs-code-config
+  labels:
+    app: vs-code
+data:
+  PUID: "1000"
+  GUID: "1000"
+  TZ: "Etc/UTC"

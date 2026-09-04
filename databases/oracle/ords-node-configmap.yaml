@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ords-node-config
+  labels:
+    app: ords-node
+data:
+  DBSERVICE: XE
+  DBHOST: oracle-db
+  DBPORT: "1521"
+  DBSERVICENAME: XE
+  CONN_STRING: "jdbc:oracle:thin:@oracle-db:1521:XE"
+  ORDS_SECURITY_ALLOWED_ORIGINS: "*"
+  ORDS_SECURITY_DISABLEDEFAULTCORS: "false"
+  DEBUG: "TRUE"

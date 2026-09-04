@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: n8n
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: n8n
+  template:
+    metadata:
+      labels:
+        app: n8n
+    spec:
+      containers:
+      - name: n8n
+        image: n8nio/n8n:latest
+        envFrom:
+          - configMapRef:
+              name: n8n-config
+          - secretRef:
+              name: n8n-secret
+        ports:
+          - containerPort: 80
+        volumeMounts:
+          - name: n8n-storage
+            mountPath: /home/node/.n8n
+      volumes:
+        - name: n8n-storage
+          hostPath:
+            path: /mnt/apps/n8n
+            type: DirectoryOrCreate

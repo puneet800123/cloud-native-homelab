@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ddns
+  labels:
+    app: ddns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ddns
+  template:
+    metadata:
+      labels:
+        app: ddns
+    spec:
+      containers:
+      - name: ddns
+        image: oznu/cloudflare-ddns
+        ports:
+        - containerPort: 80
+        env:
+        - name: API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: ddns-secret
+              key: API_KEY
+        envFrom:
+        - configMapRef:
+            name: ddns-config
+        volumeMounts:
+        - mountPath: /apps/
+          name: vol
+      volumes:
+      - name: vol
+        persistentVolumeClaim:
+          claimName: pv-claim

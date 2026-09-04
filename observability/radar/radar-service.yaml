@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: radar-svc
+  namespace: default
+spec:
+  selector:
+    app: radar
+  ports:
+    - port: 9280
+      targetPort: 9280
+  type: NodePort

@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: qbittorrent
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: qbittorrent
+  template:
+    metadata:
+      labels:
+        app: qbittorrent
+    spec:
+      containers:
+      - name: qbittorrent
+        image: lscr.io/linuxserver/qbittorrent:latest
+        ports:
+        - containerPort: 8080
+        envFrom:
+        - configMapRef:
+            name: qbittorrent-config
+        volumeMounts:
+        - name: config
+          mountPath: /config
+        - name: downloads
+          mountPath: /data/torrents
+      volumes:
+      - name: config
+        hostPath:
+          path: "/mnt/config/qbittorrent"
+          type: DirectoryOrCreate
+      - name: downloads
+        hostPath:
+          path: "/mnt/media/torrents"
+          type: DirectoryOrCreate

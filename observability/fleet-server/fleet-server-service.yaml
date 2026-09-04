@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: fleet-server
+  namespace: default
+spec:
+  type: NodePort
+  selector:
+    app: fleet-server
+  ports:
+    - name: https
+      port: 8220
+      targetPort: 8220

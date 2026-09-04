@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: inverter-ocr-config
+  labels:
+    app: inverter-ocr
+data:
+  TZ: "Asia/Kolkata"

@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: immich-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: immich-server
+  template:
+    metadata:
+      labels:
+        app: immich-server
+    spec:
+      containers:
+        - name: immich-server
+          image: ghcr.io/immich-app/immich-server:v3.1.0
+          ports:
+            - containerPort: 2283
+          envFrom:
+            - configMapRef:
+                name: immich-server-config
+            - secretRef:
+                name: immich-server-secret
+          volumeMounts:
+            - mountPath: /usr/src/app/upload
+              name: immich-data
+      volumes:
+        - name: immich-data
+          hostPath:
+            path: /mnt/data/immich
+            type: DirectoryOrCreate

@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: logstash-env
+  namespace: default
+data:
+  LS_JAVA_OPTS: "-Xms1g -Xmx1g"

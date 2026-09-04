@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: flaresolverr-config
+  labels:
+    app: flaresolverr
+data:
+  LOG_LEVEL: "info"
+  LOG_HTML: "false"
+  CAPTCHA_SOLVER: "hcaptcha-solver"
+  TZ: "Asia/Kolkata"

@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ddclient
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ddclient
+  template:
+    metadata:
+      labels:
+        app: ddclient
+    spec:
+      containers:
+        - name: ddclient
+          image: linuxserver/ddclient:latest  # Or official ddclient image if available
+          volumeMounts:
+            - name: ddclient-config
+              mountPath: "/etc/ddclient"
+      volumes:
+        - name: ddclient-config
+          hostPath:
+            path: "/mnt/.config/ddclient"
+            type: DirectoryOrCreate

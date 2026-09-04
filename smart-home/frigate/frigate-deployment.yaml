@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: frigate
+  name: frigate
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frigate
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: frigate
+    spec:
+      containers:
+        - name: frigate
+          image: ghcr.io/blakeblackshear/frigate:0.18.0-beta3
+          env:
+            - name: FRIGATE_RTSP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: frigate-secret
+                  key: FRIGATE_RTSP_PASSWORD
+          resources:
+            requests:
+              memory: "3Gi"
+              cpu: "1000m"
+            limits:
+              memory: "6Gi"   # Hard cap to stop it from running away
+              cpu: "4000m"    # Limits how much CPU frigate.detect can hijack
+          ports:
+            - containerPort: 8971
+              protocol: TCP
+            - containerPort: 5000
+              protocol: TCP
+            - containerPort: 8554
+              protocol: TCP
+            - containerPort: 8555
+              protocol: TCP
+            - containerPort: 1984
+              protocol: TCP
+            - containerPort: 8555
+              protocol: UDP
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - mountPath: /dev/shm
+              name: dshm
+            - mountPath: /etc/localtime
+              name: frigate-cm0
+              readOnly: true
+            - mountPath: /config
+              name: frigate-claim1
+            - mountPath: /media/frigate
+              name: frigate-claim2
+            - mountPath: /tmp/cache
+              name: frigate-claim3
+            - mountPath: /dev/dri
+              name: renderd128
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: frigate-cm0
+          hostPath:
+            path: /etc/localtime
+            type: File
+        - name: frigate-claim1
+          hostPath:
+            path: /mnt/config/frigate
+            type: DirectoryOrCreate
+        - name: frigate-claim2
+          hostPath:
+            path: /mnt/media/frigate
+            type: DirectoryOrCreate
+        - name: frigate-claim3
+          hostPath:
+            path: /mnt/cache/frigate
+            type: DirectoryOrCreate
+        - name: renderd128
+          hostPath:
+            path: /dev/dri
+            type: Directory
+        - name: dshm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 1Gi

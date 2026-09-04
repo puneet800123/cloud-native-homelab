@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sonarr
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sonarr
+  template:
+    metadata:
+      labels:
+        app: sonarr
+    spec:
+      containers:
+      - name: sonarr
+        image: lscr.io/linuxserver/sonarr:latest
+        ports:
+        - containerPort: 8989
+        envFrom:
+        - configMapRef:
+            name: sonarr-config
+        volumeMounts:
+        - name: config
+          mountPath: /config
+        - name: tv
+          mountPath: /tv
+        - name: downloads
+          mountPath: /downloads
+      volumes:
+      - name: config
+        hostPath:
+          path: "/mnt/config/sonarr"
+          type: DirectoryOrCreate
+      - name: downloads
+        hostPath:
+          path: "/mnt/media/torrents"
+          type: DirectoryOrCreate
+      - name: tv
+        hostPath:
+          path: "/mnt/media/tv"
+          type: DirectoryOrCreate

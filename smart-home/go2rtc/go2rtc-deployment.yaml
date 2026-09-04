@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: go2rtc
+  labels:
+    app: go2rtc
+spec:
+  replicas: 1
+  strategy:
+    # hostNetwork + host ports means only one pod can bind the ports on the
+    # single node at a time. RollingUpdate deadlocks (new pod can't schedule
+    # while old pod holds the ports). Recreate terminates the old pod first.
+    type: Recreate
+  selector:
+    matchLabels:
+      app: go2rtc
+  template:
+    metadata:
+      labels:
+        app: go2rtc
+    spec:
+      hostNetwork: true
+      containers:
+        - name: go2rtc
+          image: ghcr.io/alexxit/go2rtc:master
+          ports:
+          - name: uiport
+            containerPort: 31060 # web UI / WebRTC / API
+          - name: exposertsp
+            containerPort: 31061 # Default go2rtc RTSP port
+            protocol: TCP
+          - name: exposertspudp
+            containerPort: 31061 # Default go2rtc RTSP port
+            protocol: UDP
+          volumeMounts:
+            - name: config-volume
+              mountPath: /config
+      volumes:
+        - name: config-volume
+          hostPath:
+            path: /mnt/config/go2rtc
+            type: DirectoryOrCreate

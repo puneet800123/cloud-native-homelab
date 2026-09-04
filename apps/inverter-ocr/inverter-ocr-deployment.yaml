@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inverter-ocr
+  labels:
+    app: inverter-ocr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: inverter-ocr
+  template:
+    metadata:
+      labels:
+        app: inverter-ocr
+    spec:
+      containers:
+        - name: inverter-ocr
+          image: inverter-ocr:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 5000
+          envFrom:
+            - configMapRef:
+                name: inverter-ocr-config
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 5000
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 10

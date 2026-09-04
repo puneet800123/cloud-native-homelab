@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lidarr
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lidarr
+  template:
+    metadata:
+      labels:
+        app: lidarr
+    spec:
+      containers:
+      - name: lidarr
+        image: lscr.io/linuxserver/lidarr:latest
+        ports:
+        - containerPort: 8686
+        envFrom:
+        - configMapRef:
+            name: lidarr-config
+        volumeMounts:
+        - name: config
+          mountPath: /config
+        - name: music
+          mountPath: /music
+        - name: downloads
+          mountPath: /downloads
+      volumes:
+      - name: config
+        hostPath:
+          path: "/mnt/config/lidarr"
+          type: DirectoryOrCreate
+      - name: downloads
+        hostPath:
+          path: "/mnt/media/torrents"
+          type: DirectoryOrCreate
+      - name: music
+        hostPath:
+          path: "/mnt/media/music"
+          type: DirectoryOrCreate

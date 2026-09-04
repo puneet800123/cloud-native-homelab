@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: oracle-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: oracle-db
+  template:
+    metadata:
+      labels:
+        app: oracle-db
+    spec:
+      containers:
+        - name: oracle-db
+          image: container-registry.oracle.com/database/express:latest
+          ports:
+            - containerPort: 1521
+          env:
+            - name: ORACLE_PWD
+              valueFrom:
+                secretKeyRef:
+                  name: oracle-secret
+                  key: ORACLE_PWD
+          volumeMounts:
+            - name: oracle-data
+              mountPath: /opt/oracle/oradata
+            - name: apex-data
+              mountPath: /apex
+      volumes:
+        - name: oracle-data
+          hostPath:
+            path: "/mnt/oracledb"
+            type: DirectoryOrCreate
+        - name: apex-data
+          hostPath:
+            path: "/mnt/apex"
+            type: DirectoryOrCreate

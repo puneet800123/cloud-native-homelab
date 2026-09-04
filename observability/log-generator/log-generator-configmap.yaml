@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: log-generator-agent-config
+  namespace: default
+  labels:
+    app: log-generator
+data:
+  # Tells the entrypoint to enroll with Fleet on startup
+  FLEET_ENROLL: "true"
+  FLEET_URL: "https://fleet-server.default.svc.cluster.local:8220"
+  FLEET_CA: "/etc/agent/certs/ca.crt"

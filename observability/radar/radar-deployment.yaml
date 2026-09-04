@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: radar
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: radar
+  template:
+    metadata:
+      labels:
+        app: radar
+    spec:
+      serviceAccountName: radar
+      containers:
+      - name: radar
+        image: ghcr.io/skyhook-io/radar:latest
+        args:
+          - "--listen-address=0.0.0.0"
+          - "--timeline-storage=sqlite"
+          - "--timeline-db=/data/timeline.db"
+        ports:
+          - containerPort: 9280
+        volumeMounts:
+          - name: radar-data
+            mountPath: /data
+      volumes:
+        - name: radar-data
+          hostPath:
+            path: /mnt/apps/radar
+            type: DirectoryOrCreate

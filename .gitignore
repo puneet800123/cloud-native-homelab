@@ -1,0 +1,21 @@
+# Python virtual environments
+inverter-ocr/venv/
+yt_env/
+**/venv/
+**/.venv/
+__pycache__/
+*.pyc
+
+# Backups / editor artifacts
+*.bak
+*.swp
+*~
+
+# OS
+.DS_Store
+
+# Secrets — never commit real secret material.
+# Manifests in this repo use CHANGE_ME placeholders; keep real values out.
+*.env
+.env
+secrets.*.yaml

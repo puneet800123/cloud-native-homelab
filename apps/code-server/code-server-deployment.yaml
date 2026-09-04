@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: code-server
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: code-server
+  template:
+    metadata:
+      labels:
+        app: code-server
+    spec:
+      containers:
+        - name: code-server
+          image: codercom/code-server:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: code-server-config
+          volumeMounts:
+            - mountPath: "/home/coder"
+              name: code-storage
+            - mountPath: "/home/coder/.config/code-server"
+              name: code-config
+      volumes:
+        - name: code-storage
+          hostPath:
+            path: "/mnt"
+            type: DirectoryOrCreate
+        - name: code-config
+          hostPath:
+            path: "/mnt/.config/code-server"
+            type: DirectoryOrCreate

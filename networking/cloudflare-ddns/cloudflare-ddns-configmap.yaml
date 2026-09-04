@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cloudflare-ddns-config
+  namespace: default
+  labels:
+    app: cloudflare-ddns
+data:
+  # Non-secret DDNS config. Each container reads the zone it manages.
+  # CHANGE_ME: set to your own Cloudflare zones (domains).
+  ZONE_PRIMARY: "example.com"
+  ZONE_SECONDARY: "example.net"
+  PROXIED: "true"
+  CRON: "* * * * *"

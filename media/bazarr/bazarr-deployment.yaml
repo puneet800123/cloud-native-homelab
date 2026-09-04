@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bazarr
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bazarr
+  template:
+    metadata:
+      labels:
+        app: bazarr
+    spec:
+      containers:
+      - name: bazarr
+        image: lscr.io/linuxserver/bazarr:latest
+        ports:
+        - containerPort: 6767
+        envFrom:
+        - configMapRef:
+            name: bazarr-config
+        volumeMounts:
+        - name: config
+          mountPath: /config
+        - name: tv
+          mountPath: /tv
+        - name: movies
+          mountPath: /movies
+      volumes:
+      - name: config
+        hostPath:
+          path: "/mnt/config/bazarr"
+          type: DirectoryOrCreate
+      - name: tv
+        hostPath:
+          path: "/mnt/media/tv"
+          type: DirectoryOrCreate
+      - name: movies
+        hostPath:
+          path: "/mnt/media/movies"
+          type: DirectoryOrCreate

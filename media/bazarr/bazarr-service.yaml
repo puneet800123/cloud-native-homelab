@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: bazarr
+  namespace: default
+spec:
+  selector:
+    app: bazarr
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 6767
+  type: ClusterIP

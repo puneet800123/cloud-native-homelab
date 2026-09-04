@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: reactive-resume-config
+  labels:
+    app: reactive-resume
+data:
+  # CHANGE_ME: public URL the app is served on
+  PUBLIC_URL: "https://resume.example.com"
+  STORAGE_URL: http://minio:9000/default
+  CHROME_URL: "ws://chrome:3000"
+  STORAGE_ENDPOINT: "minio"
+  STORAGE_PORT: "9000"
+  STORAGE_BUCKET: default
+  STORAGE_USE_SSL: "false"
+  STORAGE_SKIP_BUCKET_CHECK: "false"

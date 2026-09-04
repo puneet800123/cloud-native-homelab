@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vs-code
+  labels:
+    app: vs-code
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vs-code
+  template:
+    metadata:
+      labels:
+        app: vs-code
+    spec:
+      volumes:
+      - name: vol1
+        hostPath:
+          path: /apps/VSCode
+          type: Directory
+      containers:
+      - name: vs-code
+        image: linuxserver/code-server
+        ports:
+        - containerPort: 8443
+        envFrom:
+        - configMapRef:
+            name: vs-code-config
+        env:
+        # linuxserver/code-server reads the login password from PASSWORD
+        - name: PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: vs-code-secret
+              key: PASSWORD
+        volumeMounts:
+        - mountPath: /config
+          name: vol1

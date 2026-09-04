@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vault
+  labels:
+    app: vault
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vault
+  template:
+    metadata:
+      labels:
+        app: vault
+    spec:
+      containers:
+        - name: vault
+          image: vaultwarden/server:latest
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: vault-data
+              mountPath: /data/
+      volumes:
+        - name: vault-data
+          hostPath:
+            path: "/mnt/config/vault"
+            type: DirectoryOrCreate

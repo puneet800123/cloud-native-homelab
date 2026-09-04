@@ -1,0 +1,90 @@
+# ============================================================================
+# Demo workload: busybox log generator + Elastic Agent (Fleet-managed).
+#
+# The agent enrolls with Fleet Server on startup using an enrollment token
+# (created by you in the Kibana UI). Fleet then pushes the agent's input
+# config from the Kibana-managed policy.
+#
+# Data flow:
+#   busybox  -- writes JSON logs -->  shared emptyDir at /var/log/app
+#   agent    -- tails the file   -->  Logstash  (via mTLS Beats on 5044)
+#   agent    -- enrollment + control --> Fleet Server  (HTTPS on 8220)
+# ============================================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: log-generator
+  namespace: default
+  labels:
+    app: log-generator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: log-generator
+  template:
+    metadata:
+      labels:
+        app: log-generator
+    spec:
+      serviceAccountName: fleet-server
+      containers:
+        # ------------------------------------------------------------------
+        # Container 1: busybox writes a JSON log line every 2 seconds
+        # ------------------------------------------------------------------
+        - name: busybox
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - |
+              set -e
+              mkdir -p /var/log/app
+              i=0
+              levels="INFO INFO INFO WARN ERROR DEBUG"
+              while true; do
+                i=$((i+1))
+                level=$(echo $levels | tr ' ' '\n' | sed -n "$(( (i % 6) + 1 ))p")
+                ts=$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")
+                printf '{"@timestamp":"%s","level":"%s","message":"event #%d from busybox","service":"demo-app","host":"%s"}\n' \
+                  "$ts" "$level" "$i" "$(hostname)" >> /var/log/app/app.log
+                sleep 2
+              done
+          volumeMounts:
+            - name: app-logs
+              mountPath: /var/log/app
+
+        # ------------------------------------------------------------------
+        # Container 2: Elastic Agent — enrolls with Fleet on startup
+        # ------------------------------------------------------------------
+        - name: elastic-agent
+          image: docker.elastic.co/elastic-agent/elastic-agent:8.13.4
+          securityContext:
+            runAsUser: 0
+          resources:
+            requests:
+              memory: "256Mi"
+            limits:
+              memory: "512Mi"
+          envFrom:
+            - configMapRef:
+                name: log-generator-agent-config
+            - secretRef:
+                name: log-generator-agent-secret
+          volumeMounts:
+            - name: agent-certs
+              mountPath: /etc/agent/certs
+              readOnly: true
+            - name: app-logs
+              mountPath: /var/log/app
+              readOnly: true
+            - name: agent-data
+              mountPath: /usr/share/elastic-agent/state
+      volumes:
+        - name: app-logs
+          emptyDir: {}
+        - name: agent-certs
+          secret:
+            secretName: elastic-agent-certs
+        - name: agent-data
+          emptyDir: {}

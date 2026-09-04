@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: lidarr-config
+  namespace: default
+  labels:
+    app: lidarr
+data:
+  PUID: "1000"
+  PGID: "1000"
+  TZ: "Asia/Kolkata"

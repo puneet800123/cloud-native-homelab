@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: guacamole-config
+  labels:
+    app: guacamole
+data:
+  GUACD_HOSTNAME: "guacd"
+  POSTGRES_HOSTNAME: "postgres"
+  POSTGRES_DATABASE: "postgres"
+  POSTGRES_USER: "postgres"
+  POSTGRES_PORT: "5432"
+  TZ: "Asia/Kolkata"

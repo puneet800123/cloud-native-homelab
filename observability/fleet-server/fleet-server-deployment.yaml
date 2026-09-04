@@ -1,0 +1,74 @@
+# ============================================================================
+# Fleet Server runs as the elastic-agent image but with Fleet bootstrap env
+# vars set. It needs:
+#   - A service token to read/write Fleet's indices in Elasticsearch
+#     (fleet-server-secret / FLEET_SERVER_SERVICE_TOKEN)
+#   - Its own TLS cert so agents can enroll over HTTPS (fleet-server-certs)
+#   - A "fleet-server" agent policy ID (created by Kibana on first start)
+#
+# Bootstrap is two-phase:
+#   1. Fill in fleet-server-secret with a real service token, then apply.
+#   2. Visit Kibana → Fleet → Settings to confirm Fleet Server is healthy.
+# ============================================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fleet-server
+  namespace: default
+  labels:
+    app: fleet-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fleet-server
+  template:
+    metadata:
+      labels:
+        app: fleet-server
+    spec:
+      serviceAccountName: fleet-server
+      containers:
+        - name: fleet-server
+          image: docker.elastic.co/elastic-agent/elastic-agent:8.13.4
+          securityContext:
+            runAsUser: 0
+          resources:
+            requests:
+              memory: "512Mi"
+            limits:
+              memory: "1Gi"
+          ports:
+            - name: https
+              containerPort: 8220
+          envFrom:
+            - configMapRef:
+                name: fleet-server-config
+            - secretRef:
+                name: fleet-server-secret
+          volumeMounts:
+            - name: certs
+              mountPath: /etc/fleet/certs
+              readOnly: true
+            - name: data
+              mountPath: /usr/share/elastic-agent/state
+          readinessProbe:
+            httpGet:
+              scheme: HTTPS
+              path: /api/status
+              port: 8220
+            initialDelaySeconds: 60
+            periodSeconds: 15
+          livenessProbe:
+            httpGet:
+              scheme: HTTPS
+              path: /api/status
+              port: 8220
+            initialDelaySeconds: 120
+            periodSeconds: 30
+      volumes:
+        - name: certs
+          secret:
+            secretName: fleet-server-certs
+        - name: data
+          emptyDir: {}

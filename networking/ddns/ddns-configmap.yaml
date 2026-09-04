@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ddns-config
+  labels:
+    app: ddns
+data:
+  # CHANGE_ME: set to your own Cloudflare zone (domain)
+  ZONE: "example.com"
+  CRON: "*/2 * * * *"
+  PROXIED: "true"

@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fileserver
+  labels:
+    app: fileserver
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fileserver
+  template:
+    metadata:
+      labels:
+        app: fileserver
+    spec:
+      containers:
+      - name: fileserver
+        image: filebrowser/filebrowser:s6
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - mountPath: /srv
+          name: vol1
+        - mountPath: /database
+          name: vol2
+        - mountPath: /config
+          name: vol3
+      volumes:
+      - name: vol1
+        hostPath:
+          path: /mnt/
+          type: DirectoryOrCreate
+      - name: vol2
+        hostPath:
+          path: /mnt/config/filebrowser/database
+          type: DirectoryOrCreate
+      - name: vol3
+        hostPath:
+          path: /mnt/config/filebrowser/config
+          type: DirectoryOrCreate

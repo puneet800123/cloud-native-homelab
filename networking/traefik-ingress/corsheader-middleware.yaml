@@ -1,0 +1,15 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: corsheader
+spec:
+  headers:
+    accessControlAllowMethods:
+    - "*"
+    accessControlAllowOriginList:
+    - "*"
+    accessControlAllowHeaders:
+    - "*"
+    accessControlAllowCredentials: true
+    accessControlMaxAge: 100
+    addVaryHeader: true

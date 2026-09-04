@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudflare-ddns
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cloudflare-ddns
+  template:
+    metadata:
+      labels:
+        app: cloudflare-ddns
+    spec:
+      containers:
+        - name: cloudflare-ddns
+          image: oznu/cloudflare-ddns:latest
+          env:
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: cloudflare-ddns-secret
+                  key: API_KEY
+            - name: ZONE
+              valueFrom:
+                configMapKeyRef:
+                  name: cloudflare-ddns-config
+                  key: ZONE_PRIMARY
+            - name: PROXIED
+              valueFrom:
+                configMapKeyRef:
+                  name: cloudflare-ddns-config
+                  key: PROXIED
+            - name: CRON
+              valueFrom:
+                configMapKeyRef:
+                  name: cloudflare-ddns-config
+                  key: CRON
+        - name: cloudflare-ddns-secondary
+          image: oznu/cloudflare-ddns:latest
+          env:
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: cloudflare-ddns-secret
+                  key: API_KEY
+            - name: ZONE
+              valueFrom:
+                configMapKeyRef:
+                  name: cloudflare-ddns-config
+                  key: ZONE_SECONDARY
+            - name: PROXIED
+              valueFrom:
+                configMapKeyRef:
+                  name: cloudflare-ddns-config
+                  key: PROXIED
+            - name: CRON
+              valueFrom:
+                configMapKeyRef:
+                  name: cloudflare-ddns-config
+                  key: CRON

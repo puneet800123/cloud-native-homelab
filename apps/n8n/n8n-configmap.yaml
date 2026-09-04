@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: n8n-config
+  namespace: default
+  labels:
+    app: n8n
+data:
+  DB_TYPE: postgresdb
+  DB_POSTGRESDB_HOST: postgres
+  DB_POSTGRESDB_PORT: "5432"
+  DB_POSTGRESDB_DATABASE: n8ndb
+  DB_POSTGRESDB_USER: postgres
+  N8N_BASIC_AUTH_ACTIVE: "true"
+  N8N_PORT: "80"
+  # CHANGE_ME: public URL n8n is served on
+  WEBHOOK_URL: "https://n8n.example.com"

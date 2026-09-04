@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ords-node
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ords-node
+  template:
+    metadata:
+      labels:
+        app: ords-node
+    spec:
+      containers:
+        - name: ords
+          image: container-registry.oracle.com/database/ords:25.1.1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: ords-node-config
+          env:
+            - name: ORACLE_PWD
+              valueFrom:
+                secretKeyRef:
+                  name: oracle-secret
+                  key: ORACLE_PWD
+          volumeMounts:
+            - name: ords-config
+              mountPath: /etc/ords/config
+            - name: apex-files
+              mountPath: /opt/oracle/apex
+          readinessProbe:
+            httpGet:
+              path: /ords/
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /ords/
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 20
+      volumes:
+        - name: ords-config
+          hostPath:
+            path: "/mnt/ords"
+            type: DirectoryOrCreate
+        - name: apex-files
+          hostPath:
+            path: "/mnt/apex"
+            type: DirectoryOrCreate
