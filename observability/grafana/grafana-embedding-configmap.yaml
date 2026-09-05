@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-embedding-config
+  namespace: default
+  labels:
+    app: grafana
+data:
+  # Non-secret Grafana settings that allow panels to be embedded in an <iframe>
+  # (e.g. on the portfolio dashboard) and viewed anonymously.
+  GF_SECURITY_ALLOW_EMBEDDING: "true"
+  GF_SECURITY_COOKIE_SAMESITE: "none"
+  GF_AUTH_ANONYMOUS_ENABLED: "true"
+  GF_AUTH_ANONYMOUS_ORG_ROLE: "Viewer"
+  # CHANGE_ME: set to the public URL Grafana is served on for correct links
+  GF_SERVER_ROOT_URL: "http://localhost:3000"
